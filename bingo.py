@@ -1,142 +1,146 @@
-import random # Thư viện random dùng để sinh số ngẫu nhiên
+import random  # nhập module random để sinh số ngẫu nhiên
 
-def nhap_tien_cuoc(so_tien_hien_co): # Hàm phụ để tái sử dụng việc nhập tiền cược
-    while True: # Vòng lặp yêu cầu nhập lại nếu sai
-        try: # Bắt lỗi nhập liệu
-            tien_cuoc = float(input("Nhập số tiền đặt cược: ")) # Nhập tiền cược
-            if 0 < tien_cuoc <= so_tien_hien_co: # Kiểm tra tiền cược hợp lệ (lớn hơn 0 và không vượt quá số dư)
-                return tien_cuoc # Trả về số tiền cược nếu hợp lệ
-            print("Số tiền cược không hợp lệ hoặc lớn hơn số tiền hiện có.") # Thông báo lỗi
-        except ValueError: # Bắt lỗi nếu nhập không phải là số
-            print("Dữ liệu nhập không hợp lệ.") # Thông báo lỗi
+SAVE_FILE = "so_tien_con_lai.txt"  # tên file để lưu số tiền còn lại
 
-def bingo_1_so(so_tien_hien_co): # Hàm xử lý chức năng 1
-    try: # Bắt lỗi khi nhập số mua
-        so_mua = int(input("Nhập số muốn mua (0-9): ")) # Nhập số mua
-        if so_mua < 0 or so_mua > 9: # Kiểm tra khoảng giá trị
-            print("Số mua phải từ 0 đến 9.") # Thông báo lỗi
-            return so_tien_hien_co # Trả lại số dư cũ nếu có lỗi để tiếp tục vòng lặp main
-    except ValueError: # Bắt lỗi không phải số
-        print("Dữ liệu nhập không hợp lệ.") # Thông báo lỗi
-        return so_tien_hien_co # Trả lại số dư cũ
-        
-    tien_cuoc = nhap_tien_cuoc(so_tien_hien_co) # Gọi hàm phụ để lấy tiền cược hợp lệ
-    
-    bingo_kq = [random.randint(0, 9) for _ in range(3)] # Sinh 3 số ngẫu nhiên
-    print(f"Kết quả xổ số: {bingo_kq}") # In kết quả
-    
-    if so_mua in bingo_kq: # Nếu số mua có trong kết quả
-        so_tien_hien_co += tien_cuoc # Cộng tiền lời
-        print(f"Chúc mừng! Bạn đã trúng. Số tiền hiện tại: {so_tien_hien_co}") # Thông báo trúng
-    else: # Nếu không trúng
-        so_tien_hien_co -= tien_cuoc # Trừ tiền cược
-        print(f"Rất tiếc! Bạn không trúng. Số tiền còn lại: {so_tien_hien_co}") # Thông báo trượt
-        
-    return so_tien_hien_co # Trả về số dư sau khi đã cộng/trừ tiền
 
-def bingo_2_so(so_tien_hien_co): # Hàm xử lý chức năng 2
-    try: # Bắt lỗi nhập số
-        so_mua = int(input("Nhập số muốn mua (0-9): ")) # Nhập số mua
-        if so_mua < 0 or so_mua > 9: # Kiểm tra điều kiện
-            print("Số mua phải từ 0 đến 9.") # Báo lỗi
-            return so_tien_hien_co # Dừng chức năng và trả lại tiền
-    except ValueError: # Bắt lỗi nhập chữ
-        print("Dữ liệu nhập không hợp lệ.") # Báo lỗi
-        return so_tien_hien_co # Dừng chức năng
-        
-    tien_cuoc = nhap_tien_cuoc(so_tien_hien_co) # Lấy số tiền cược
-    
-    bingo_kq = [random.randint(0, 9) for _ in range(3)] # Quay xổ số
-    print(f"Kết quả xổ số: {bingo_kq}") # In kết quả
-    
-    if bingo_kq.count(so_mua) >= 2: # Nếu số mua xuất hiện từ 2 lần trở lên
-        so_tien_hien_co += tien_cuoc * 2 # Cộng 2 lần tiền cược
-        print(f"Chúc mừng! Bạn đã trúng. Số tiền hiện tại: {so_tien_hien_co}") # Báo trúng
-    else: # Nếu xuất hiện ít hơn 2 lần
-        so_tien_hien_co -= tien_cuoc # Bị trừ tiền cược
-        print(f"Rất tiếc! Bạn không trúng. Số tiền còn lại: {so_tien_hien_co}") # Báo thua
-        
-    return so_tien_hien_co # Trả về số dư mới
+def nhap_tien_ban_dau(prompt):  # hàm nhập số tiền ban đầu
+    while True:
+        try:
+            value = float(input(prompt).strip())  # đọc chuỗi, bỏ khoảng trắng, chuyển thành float
+            if value > 0:
+                return value  # trả về khi giá trị hợp lệ
+            print("Vui lòng nhập số lớn hơn 0.")  # yêu cầu nhập lại nếu không dương
+        except ValueError:
+            print("Dữ liệu không hợp lệ. Hãy nhập một số.")  # thông báo nếu nhập sai định dạng
 
-def tai_xiu_hoa(so_tien_hien_co): # Hàm xử lý chức năng 3
-    print("Chọn kết quả:") # Hiển thị tùy chọn
-    print("1. Xỉu (Tổng 0-8)") # Chọn xỉu
-    print("2. Hòa (Tổng 9-18)") # Chọn hòa
-    print("3. Tài (Tổng 19-27)") # Chọn tài
-    lua_chon_txh = input("Nhập lựa chọn của bạn (1-3): ") # Nhập từ bàn phím
-    if lua_chon_txh not in ['1', '2', '3']: # Nếu nhập sai
-        print("Lựa chọn không hợp lệ.") # Báo lỗi
-        return so_tien_hien_co # Dừng chức năng
-        
-    tien_cuoc = nhap_tien_cuoc(so_tien_hien_co) # Nhập tiền cược
-    
-    bingo_kq = [random.randint(0, 9) for _ in range(3)] # Quay 3 số
-    print(f"Kết quả xổ số: {bingo_kq}") # In kết quả
-    tong_diem = sum(bingo_kq) # Tính tổng điểm
-    print(f"Tổng điểm: {tong_diem}") # In tổng điểm
-    
-    ket_qua_thuc_te = "" # Tạo chuỗi lưu kết quả
-    if 0 <= tong_diem <= 8: # Mốc xỉu
-        ket_qua_thuc_te = "1" # Mã cho xỉu
-        print("Kết quả là: Xỉu") # In ra xỉu
-    elif 9 <= tong_diem <= 18: # Mốc hòa
-        ket_qua_thuc_te = "2" # Mã cho hòa
-        print("Kết quả là: Hòa") # In ra hòa
-    else: # Mốc tài
-        ket_qua_thuc_te = "3" # Mã cho tài
-        print("Kết quả là: Tài") # In ra tài
-        
-    if lua_chon_txh == ket_qua_thuc_te: # Nếu chọn đúng
-        so_tien_hien_co += tien_cuoc * 0.5 # Ăn 50% tiền cược
-        print(f"Chúc mừng! Bạn đã thắng. Số tiền hiện tại: {so_tien_hien_co}") # In thông báo thắng
-    else: # Nếu chọn sai
-        so_tien_hien_co -= tien_cuoc # Bị trừ tiền cược
-        print(f"Rất tiếc! Bạn đoán sai. Số tiền còn lại: {so_tien_hien_co}") # In thông báo thua
-        
-    return so_tien_hien_co # Trả về số tiền cập nhật
 
-def in_tai_khoan(so_tien_hien_co): # Hàm xử lý chức năng 4
-    print(f"Số tiền hiện tại trong tài khoản của bạn là: {so_tien_hien_co}") # In số tiền hiện tại
+def nhap_so_nguyen(prompt, min_value, max_value):  # hàm nhập số nguyên trong khoảng cố định
+    while True:
+        try:
+            value = int(input(prompt).strip())  # đọc và chuyển sang số nguyên
+            if min_value <= value <= max_value:
+                return value  # trả về nếu hợp lệ
+            print(f"Vui lòng nhập số nguyên từ {min_value} đến {max_value}.")
+        except ValueError:
+            print("Dữ liệu không hợp lệ. Hãy nhập một số nguyên.")
 
-def ghi_file_va_thoat(so_tien_hien_co): # Hàm xử lý chức năng 5
-    try: # Bắt lỗi khi thao tác với file
-        with open("account_balance.txt", "w", encoding="utf-8") as f: # Mở (hoặc tạo) file để ghi đè
-            f.write(f"Số tiền còn lại trong tài khoản: {so_tien_hien_co}") # Tiến hành ghi thông tin
-        print("Đã ghi số tiền còn lại vào file 'account_balance.txt'.") # Báo thành công
-    except Exception as e: # Bắt các lỗi file không lường trước
-        print(f"Có lỗi khi ghi file: {e}") # In thông báo lỗi
-    print("Cảm ơn bạn đã chơi! Hẹn gặp lại.") # Lời chào tạm biệt
 
-def main(): # Hàm chính điều khiển luồng chương trình
-    try: # Bắt lỗi khi nhập tiền gốc
-        so_tien_hien_co = float(input("Nhập số tiền hiện có ban đầu: ")) # Nhập số tiền vào
-    except ValueError: # Lỗi không phải là số
-        print("Vui lòng nhập một số hợp lệ.") # In cảnh báo
-        return # Thoát chương trình
+def ghi_so_tien(balance):  # hàm ghi số tiền còn lại vào file
+    try:
+        with open(SAVE_FILE, "w", encoding="utf-8") as f:  # mở file ở chế độ ghi
+            f.write(f"Số tiền còn lại: {balance:.2f}\n")  # ghi số tiền với 2 chữ số thập phân
+    except OSError as exc:
+        print(f"Không thể ghi file: {exc}")  # hiển thị lỗi nếu ghi file không được
 
-    while True: # Bắt đầu vòng lặp hiển thị menu
-        print("\n--- MENU TRÒ CHƠI BINGO ---") # In tiêu đề
-        print("1. Bingo 1 số") # Lựa chọn 1
-        print("2. Chọn 2 số trùng nhau") # Lựa chọn 2
-        print("3. Lớn/ nhỏ/ hòa (Tài/Xỉu/Hòa)") # Lựa chọn 3
-        print("4. In số tiền trong tài khoản") # Lựa chọn 4
-        print("5. Ghi số tiền còn lại trong tài khoản vào file text và Thoát") # Lựa chọn 5
-        
-        chon = input("Chọn chức năng (1-5): ") # Yêu cầu người dùng chọn
-        
-        if chon == '1': # Rẽ nhánh 1
-            so_tien_hien_co = bingo_1_so(so_tien_hien_co) # Gọi hàm 1, cập nhật lại biến lưu tiền
-        elif chon == '2': # Rẽ nhánh 2
-            so_tien_hien_co = bingo_2_so(so_tien_hien_co) # Gọi hàm 2, cập nhật lại biến lưu tiền
-        elif chon == '3': # Rẽ nhánh 3
-            so_tien_hien_co = tai_xiu_hoa(so_tien_hien_co) # Gọi hàm 3, cập nhật lại biến lưu tiền
-        elif chon == '4': # Rẽ nhánh 4
-            in_tai_khoan(so_tien_hien_co) # Gọi hàm 4, không cần nhận lại giá trị
-        elif chon == '5': # Rẽ nhánh 5
-            ghi_file_va_thoat(so_tien_hien_co) # Gọi hàm 5 để lưu file
-            break # Phá vỡ vòng lặp (thoát trò chơi)
-        else: # Người dùng nhập linh tinh
-            print("Lựa chọn không hợp lệ, vui lòng chọn từ 1 đến 5.") # Nhắc nhở
 
-if __name__ == "__main__": # Kiểm tra xem script có đang chạy như luồng chính không
-    main() # Kích hoạt hàm main()
+def quay_so():  # hàm tạo 3 số ngẫu nhiên từ 0 đến 9
+    return [random.randint(0, 9) for _ in range(3)]
+
+
+def dinh_dang_quay(quay):  # hàm chuyển danh sách số thành chuỗi hiển thị
+    return " ".join(str(x) for x in quay)
+
+
+def nhap_tien_cuoc(balance):  # hàm nhập tiền cược và kiểm tra số dư đủ
+    while True:
+        amount = nhap_tien_ban_dau("Nhập số tiền cược: ")  # yêu cầu người chơi nhập tiền cược
+        if amount <= balance:
+            return amount  # nếu còn đủ tiền thì trả về
+        print("Số tiền cược không được lớn hơn số tiền hiện có.")
+
+
+def bingo_1_so(balance):  # chức năng Bingo 1 số
+    print("\n--- Bingo 1 số ---")
+    choice = nhap_so_nguyen("Chọn 1 số từ 0 đến 9: ", 0, 9)  # người chơi chọn 1 số
+    amount = nhap_tien_cuoc(balance)  # nhập tiền cược
+    draw = quay_so()  # quay 3 số ngẫu nhiên
+    print(f"Kết quả xổ số: {dinh_dang_quay(draw)}")  # in kết quả
+    if choice in draw:
+        reward = amount  # thắng nhân đôi số tiền cược (lợi nhuận = 1 lần cược)
+        balance += reward
+        print(f"Bạn đã thắng! Số {choice} xuất hiện. Nhận được thêm {reward:.2f}.")
+    else:
+        balance -= amount  # thua mất tiền cược
+        print(f"Bạn đã thua. Số {choice} không xuất hiện. Mất {amount:.2f}.")
+    return balance  # trả về số dư cập nhật
+
+
+def bingo_2_so(balance):  # chức năng chọn 2 số trùng nhau
+    print("\n--- Chọn 2 số trùng nhau ---")
+    choice = nhap_so_nguyen("Chọn 1 số từ 0 đến 9: ", 0, 9)  # chọn số dự đoán
+    amount = nhap_tien_cuoc(balance)  # nhập tiền cược
+    draw = quay_so()  # quay 3 số
+    print(f"Kết quả xổ số: {dinh_dang_quay(draw)}")
+    same_count = draw.count(choice)  # đếm số lần xuất hiện của số chọn
+    if same_count >= 2:
+        reward = amount * 2  # thắng nhân ba tổng số tiền cược (lợi nhuận = 2 lần cược)
+        balance += reward
+        print(f"Chúc mừng! Số {choice} xuất hiện {same_count} lần. Nhận được thêm {reward:.2f}.")
+    else:
+        balance -= amount  # nếu không đúng 2 số thì thua
+        print(f"Bạn thua. Số {choice} xuất hiện {same_count} lần. Mất {amount:.2f}.")
+    return balance  # trả về số dư sau cược
+
+
+def tai_xiu_hoa(balance):  # chức năng cược Tài / Xỉu / Hòa
+    print("\n--- Tài / Xỉu / Hòa ---")
+    print("1. Xỉu (tổng 0-8)")
+    print("2. Hòa (tổng 9-18)")
+    print("3. Tài (tổng 19-27)")
+    choice = nhap_so_nguyen("Chọn loại cược (1-3): ", 1, 3)  # chọn loại cược
+    amount = nhap_tien_cuoc(balance)  # nhập tiền cược
+    draw = quay_so()  # quay 3 số
+    total = sum(draw)  # tính tổng 3 số
+    print(f"Kết quả xổ số: {dinh_dang_quay(draw)} (tổng = {total})")
+    if total <= 8:
+        result = 1  # Xỉu
+    elif total <= 18:
+        result = 2  # Hòa
+    else:
+        result = 3  # Tài
+
+    if choice == result:
+        reward = amount * 0.5  # thắng được 50% số tiền cược
+        balance += reward
+        print(f"Bạn thắng! Nhận được thêm {reward:.2f}.")
+    else:
+        balance -= amount  # thua mất tiền cược
+        print(f"Bạn thua. Mất {amount:.2f}.")
+    return balance  # trả về số dư cập nhật
+
+
+def main():  # hàm chính điều khiển menu
+    print("=== TRÒ CHƠI BINGO ===")
+    balance = nhap_tien_ban_dau("Nhập số tiền hiện có ban đầu: ")  # nhập số dư ban đầu
+    while True:
+        print("\n--- MENU ---")
+        print("1. Bingo 1 số")
+        print("2. Chọn 2 số trùng nhau")
+        print("3. Lớn / nhỏ / hòa")
+        print("4. In số tiền trong tài khoản")
+        print("5. Ghi số tiền còn lại vào file và thoát")
+        choice = nhap_so_nguyen("Chọn chức năng (1-5): ", 1, 5)  # chọn chức năng
+
+        if choice == 1:
+            balance = bingo_1_so(balance)  # xử lý bingo 1 số
+        elif choice == 2:
+            balance = bingo_2_so(balance)  # xử lý chọn 2 số trùng nhau
+        elif choice == 3:
+            balance = tai_xiu_hoa(balance)  # xử lý lớn/nhỏ/hòa
+        elif choice == 4:
+            print(f"Số tiền hiện có: {balance:.2f}")  # in số dư tài khoản
+        elif choice == 5:
+            ghi_so_tien(balance)  # lưu số dư vào file
+            print(f"Đã lưu số tiền còn lại vào '{SAVE_FILE}'.")
+            print("Cảm ơn bạn đã chơi!")
+            break  # thoát chương trình
+
+        if balance <= 0:
+            print("Bạn đã hết tiền. Trò chơi kết thúc.")
+            ghi_so_tien(balance)  # lưu số dư khi hết tiền
+            print(f"Số dư đã được lưu vào '{SAVE_FILE}'.")
+            break  # dừng vòng lặp khi hết tiền
+
+
+if __name__ == "__main__":
+    main()  # chạy chương trình chính
